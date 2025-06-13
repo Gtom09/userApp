@@ -1,0 +1,298 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  phone             String   @unique
+  name              String
+  password          String
+  aadhaarNumber     String?  @unique
+  aadhaarVerified   Boolean  @default(false)
+  emailVerified     Boolean  @default(false)
+  phoneVerified     Boolean  @default(false)
+  profileImage      String?
+  address           String?
+  city              String?
+  state             String?
+  pincode           String?
+  latitude          Float?
+  longitude         Float?
+  userType          UserType @default(CUSTOMER)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  customerBookings  Booking[] @relation("CustomerBookings")
+  providerBookings  Booking[] @relation("ProviderBookings")
+  reviews           Review[]
+  chats             Chat[]
+  messages          Message[]
+  notifications     Notification[]
+  payments          Payment[]
+  serviceProvider   ServiceProvider?
+
+  @@map("users")
+}
+
+model ServiceProvider {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  businessName      String?
+  description       String?
+  experience        Int?     // years of experience
+  hourlyRate        Float?
+  availability      Json?    // flexible availability schedule
+  verified          Boolean  @default(false)
+  rating            Float    @default(0)
+  totalReviews      Int      @default(0)
+  totalBookings     Int      @default(0)
+  completedBookings Int      @default(0)
+  isAvailable       Boolean  @default(true)
+  documents         Json?    // store document URLs
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services          ServiceProviderService[]
+  portfolioImages   PortfolioImage[]
+
+  @@map("service_providers")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String
+  basePrice   Float?
+  unit        String?  // per hour, per sq ft, etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  providers   ServiceProviderService[]
+  bookings    Booking[]
+
+  @@map("services")
+}
+
+model ServiceProviderService {
+  id                String   @id @default(cuid())
+  serviceProviderId String
+  serviceId         String
+  customPrice       Float?
+  description       String?
+  createdAt         DateTime @default(now())
+
+  // Relations
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id], onDelete: Cascade)
+  service           Service         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceProviderId, serviceId])
+  @@map("service_provider_services")
+}
+
+model PortfolioImage {
+  id                String   @id @default(cuid())
+  serviceProviderId String
+  imageUrl          String
+  description       String?
+  createdAt         DateTime @default(now())
+
+  // Relations
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_images")
+}
+
+model Booking {
+  id                String        @id @default(cuid())
+  customerId        String
+  providerId        String
+  serviceId         String
+  scheduledDate     DateTime
+  scheduledTime     String
+  status            BookingStatus @default(PENDING)
+  description       String?
+  estimatedPrice    Float?
+  finalPrice        Float?
+  address           String
+  latitude          Float?
+  longitude         Float?
+  notes             String?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationReason String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  customer          User          @relation("CustomerBookings", fields: [customerId], references: [id])
+  provider          User          @relation("ProviderBookings", fields: [providerId], references: [id])
+  service           Service       @relation(fields: [serviceId], references: [id])
+  review            Review?
+  payment           Payment?
+  chat              Chat?
+
+  @@map("bookings")
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  bookingId   String   @unique
+  userId      String
+  rating      Int      // 1-5 stars
+  comment     String?
+  images      String[] // array of image URLs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
+}
+
+model Chat {
+  id          String   @id @default(cuid())
+  bookingId   String   @unique
+  customerId  String
+  providerId  String
+  lastMessage String?
+  lastMessageAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  booking     Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer    User      @relation(fields: [customerId], references: [id])
+  messages    Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  chatId    String
+  senderId  String
+  content   String
+  type      MessageType @default(TEXT)
+  imageUrl  String?
+  readAt    DateTime?
+  createdAt DateTime    @default(now())
+
+  // Relations
+  chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    User        @relation(fields: [senderId], references: [id])
+
+  @@map("messages")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String        @unique
+  userId          String
+  amount          Float
+  currency        String        @default("INR")
+  status          PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  stripePaymentId String?
+  transactionId   String?
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  booking         Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  data      Json?            // additional data for the notification
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  phone     String
+  email     String?
+  code      String
+  type      OTPType
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("otps")
+}
+
+// Enums
+enum UserType {
+  CUSTOMER
+  SERVICE_PROVIDER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SYSTEM
+}
+
+enum NotificationType {
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  PAYMENT_RECEIVED
+  REVIEW_RECEIVED
+  CHAT_MESSAGE
+  SYSTEM_UPDATE
+}
+
+enum OTPType {
+  PHONE_VERIFICATION
+  EMAIL_VERIFICATION
+  AADHAAR_VERIFICATION
+  PASSWORD_RESET
+}
