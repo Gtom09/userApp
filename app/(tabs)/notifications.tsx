@@ -131,7 +131,7 @@ export default function NotificationsScreen() {
   const unreadCount = DUMMY_NOTIFICATIONS.filter(n => !n.read).length;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Notifications</Text>

@@ -6,10 +6,10 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  SafeAreaView,
   TextInput,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { 
   ArrowLeft, 
@@ -283,7 +283,7 @@ export default function ServiceListingScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
