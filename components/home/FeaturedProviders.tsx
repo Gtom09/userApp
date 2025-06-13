@@ -55,45 +55,50 @@ const PROVIDERS = [
 
 export default function FeaturedProviders() {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-    >
-      {PROVIDERS.map((provider) => (
-        <TouchableOpacity 
-          key={provider.id} 
-          style={styles.providerCard}
-          activeOpacity={0.8}
-        >
-          <Image 
-            source={{ uri: provider.image }} 
-            style={styles.providerImage} 
-          />
-          <View style={styles.providerInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.providerName}>{provider.name}</Text>
-              {provider.verified && (
-                <View style={styles.verifiedBadge}>
-                  <Text style={styles.verifiedText}>Verified</Text>
-                </View>
-              )}
+    <View style={styles.wrapper}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.container}
+      >
+        {PROVIDERS.map((provider) => (
+          <TouchableOpacity 
+            key={provider.id} 
+            style={styles.providerCard}
+            activeOpacity={0.8}
+          >
+            <Image 
+              source={{ uri: provider.image }} 
+              style={styles.providerImage} 
+            />
+            <View style={styles.providerInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.providerName}>{provider.name}</Text>
+                {provider.verified && (
+                  <View style={styles.verifiedBadge}>
+                    <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.specialty}>{provider.specialty}</Text>
+              <View style={styles.ratingRow}>
+                <Star size={14} color="#F59E0B" fill="#F59E0B" />
+                <Text style={styles.rating}>{provider.rating}</Text>
+                <Text style={styles.reviews}>({provider.reviews})</Text>
+              </View>
+              <Text style={styles.price}>{provider.price}</Text>
             </View>
-            <Text style={styles.specialty}>{provider.specialty}</Text>
-            <View style={styles.ratingRow}>
-              <Star size={14} color="#F59E0B" fill="#F59E0B" />
-              <Text style={styles.rating}>{provider.rating}</Text>
-              <Text style={styles.reviews}>({provider.reviews})</Text>
-            </View>
-            <Text style={styles.price}>{provider.price}</Text>
-          </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 0,
+  },
   container: {
     paddingRight: 20,
   },

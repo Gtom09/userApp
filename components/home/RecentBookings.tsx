@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
+    marginBottom: 0,
     ...Platform.select({
       ios: {
         shadowColor: '#CBD5E1',
@@ -161,6 +162,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
+    marginBottom: 0,
     ...Platform.select({
       ios: {
         shadowColor: '#CBD5E1',

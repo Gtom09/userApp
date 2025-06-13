@@ -28,7 +28,7 @@ export default function HomeScreen() {
   }, [fadeAnim]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
         {/* Header */}
         <View style={styles.header}>
@@ -70,7 +70,7 @@ export default function HomeScreen() {
           </View>
           
           {/* Recent Bookings */}
-          <View style={styles.sectionContainer}>
+          <View style={[styles.sectionContainer, styles.lastSection]}>
             <Text style={styles.sectionTitle}>Recent Bookings</Text>
             <RecentBookings />
           </View>
@@ -162,11 +162,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 0,
   },
   sectionContainer: {
     marginTop: 24,
     paddingHorizontal: 20,
+  },
+  lastSection: {
+    marginBottom: 0,
+    paddingBottom: 0,
   },
   sectionTitle: {
     fontSize: 18,
