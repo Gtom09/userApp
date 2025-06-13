@@ -36,7 +36,7 @@ export default function AadhaarVerificationScreen() {
   }, [showOtpInput]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (otpSent && timer > 0) {
       interval = setInterval(() => {
         setTimer(timer - 1);
@@ -195,7 +195,7 @@ export default function AadhaarVerificationScreen() {
                 {otp.map((digit, index) => (
                   <TextInput
                     key={index}
-                    ref={(ref) => (otpRefs.current[index] = ref!)}
+                    ref={(ref) => { otpRefs.current[index] = ref! }}
                     style={styles.otpInput}
                     value={digit}
                     onChangeText={(text) => handleOtpChange(text, index)}

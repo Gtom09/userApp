@@ -80,13 +80,13 @@ export default function ProfileScreen() {
           icon: <CreditCard size={20} color="#3B82F6" />,
           title: 'Payment Methods',
           subtitle: 'Manage your payment options',
-          onPress: () => router.push('/payment-methods'),
+          onPress: () => router.push('/payment-methods' as any),
         },
         {
           icon: <MapPin size={20} color="#3B82F6" />,
           title: 'Addresses',
           subtitle: 'Manage your saved addresses',
-          onPress: () => router.push('/addresses'),
+          onPress: () => router.push('/addresses' as any),
         },
       ]
     },
@@ -106,7 +106,7 @@ export default function ProfileScreen() {
           icon: <Shield size={20} color="#3B82F6" />,
           title: 'Privacy & Security',
           subtitle: 'Manage your privacy settings',
-          onPress: () => router.push('/privacy-settings'),
+          onPress: () => router.push('/privacy-settings' as any),
         },
       ]
     },
@@ -117,7 +117,7 @@ export default function ProfileScreen() {
           icon: <Gift size={20} color="#3B82F6" />,
           title: 'Refer Friends',
           subtitle: 'Earn rewards by referring friends',
-          onPress: () => router.push('/referrals'),
+          onPress: () => router.push('/referrals' as any),
         },
         {
           icon: <Star size={20} color="#3B82F6" />,
@@ -129,13 +129,13 @@ export default function ProfileScreen() {
           icon: <HelpCircle size={20} color="#3B82F6" />,
           title: 'Help & Support',
           subtitle: 'Get help with your account',
-          onPress: () => router.push('/help-support'),
+          onPress: () => router.push('/help-support' as any),
         },
         {
           icon: <FileText size={20} color="#3B82F6" />,
           title: 'Terms & Privacy',
           subtitle: 'Read our terms and privacy policy',
-          onPress: () => router.push('/terms-privacy'),
+          onPress: () => router.push('/terms-privacy' as any),
         },
       ]
     }

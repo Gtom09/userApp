@@ -196,7 +196,7 @@ export default function ServiceListingScreen() {
   const renderProvider = ({ item }: { item: any }) => (
     <TouchableOpacity 
       style={styles.providerCard}
-      onPress={() => router.push(`/provider/${item.id}`)}
+      onPress={() => router.push("/provider/[id]" as any)}
       activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>

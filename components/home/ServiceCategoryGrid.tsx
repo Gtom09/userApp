@@ -106,7 +106,7 @@ export default function ServiceCategoryGrid() {
     router.push(`/services/${category.route}`);
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item, index }: { item: typeof CATEGORIES[0], index: number }) => {
     return (
       <Animated.View
         style={{
