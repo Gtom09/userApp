@@ -5,16 +5,17 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
-  KeyboardAvoidingView,
   Platform,
-  Alert,
+  KeyboardAvoidingView,
   Animated,
+  Alert,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Shield, ArrowLeft, CheckCircle } from 'lucide-react-native';
+import { ArrowLeft, Shield, CheckCircle } from 'lucide-react-native';
 
 export default function AadhaarVerificationScreen() {
+  const insets = useSafeAreaInsets();
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -131,12 +132,12 @@ export default function AadhaarVerificationScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) }]}>
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => router.back()}
@@ -148,7 +149,7 @@ export default function AadhaarVerificationScreen() {
         </View>
 
         <View style={styles.content}>
-          <View style={styles.iconContainer}>
+          <View style={[styles.iconContainer, { marginTop: Math.max(insets.top + 12, 24) }]}>
             <Shield size={60} color="#3B82F6" />
           </View>
 
@@ -168,7 +169,7 @@ export default function AadhaarVerificationScreen() {
                   value={aadhaarNumber}
                   onChangeText={handleAadhaarChange}
                   keyboardType="numeric"
-                  maxLength={14} // 12 digits + 2 spaces
+                  maxLength={14}
                 />
               </View>
 
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
@@ -275,10 +276,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
   },
   iconContainer: {
     alignItems: 'center',
+    marginTop: 24,
     marginBottom: 24,
   },
   title: {
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
     lineHeight: 24,
   },
   formContainer: {
