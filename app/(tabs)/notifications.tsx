@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, CheckCircle, AlertCircle, Calendar, Star } from 'lucide-react-native';
+import { Bell, CircleCheck as CheckCircle, CircleAlert as AlertCircle, Calendar, Star } from 'lucide-react-native';
 
 const DUMMY_NOTIFICATIONS = [
   {
