@@ -218,7 +218,7 @@ export default function ServiceListingScreen() {
   };
 
   const handleProviderPress = (providerId: string) => {
-    router.push(`/provider/${providerId}`);
+    router.push(`/provider/[id]?id=${providerId}`);
   };
 
   const applyFilters = () => {

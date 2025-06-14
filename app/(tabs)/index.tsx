@@ -29,7 +29,7 @@ export default function HomeScreen() {
   }, [fadeAnim]);
 
   const handleCartPress = () => {
-    router.push('/cart');
+    router.push('/cart/index');
   };
 
   return (
@@ -42,12 +42,12 @@ export default function HomeScreen() {
               <Text style={styles.locationNumber}>147,12th cross</Text>
               <Text style={styles.locationText}>Rachenahalli- Yelahanka- Bengalur...</Text>
             </View>
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
               style={styles.cartButton}
               onPress={handleCartPress}
             >
               <ShoppingCart size={24} color="#1E293B" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
         
