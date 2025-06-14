@@ -28,7 +28,8 @@ import {
   Gift,
   Users,
   FileText,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
@@ -61,6 +62,14 @@ export default function ProfileScreen() {
     setEditModalVisible(true);
   };
 
+  const handleMyBookings = () => {
+    router.push('/(tabs)/bookings');
+  };
+
+  const handleSettings = () => {
+    Alert.alert('Settings', 'Settings screen would open here');
+  };
+
   const saveProfile = () => {
     setEditModalVisible(false);
     Alert.alert('Success', 'Profile updated successfully!');
@@ -80,13 +89,13 @@ export default function ProfileScreen() {
           icon: <CreditCard size={20} color="#3B82F6" />,
           title: 'Payment Methods',
           subtitle: 'Manage your payment options',
-          onPress: () => router.push('/payment-methods' as any),
+          onPress: () => Alert.alert('Payment Methods', 'Payment methods screen would open here'),
         },
         {
           icon: <MapPin size={20} color="#3B82F6" />,
           title: 'Addresses',
           subtitle: 'Manage your saved addresses',
-          onPress: () => router.push('/addresses' as any),
+          onPress: () => Alert.alert('Addresses', 'Addresses screen would open here'),
         },
       ]
     },
@@ -106,7 +115,7 @@ export default function ProfileScreen() {
           icon: <Shield size={20} color="#3B82F6" />,
           title: 'Privacy & Security',
           subtitle: 'Manage your privacy settings',
-          onPress: () => router.push('/privacy-settings' as any),
+          onPress: () => Alert.alert('Privacy & Security', 'Privacy settings screen would open here'),
         },
       ]
     },
@@ -117,7 +126,7 @@ export default function ProfileScreen() {
           icon: <Gift size={20} color="#3B82F6" />,
           title: 'Refer Friends',
           subtitle: 'Earn rewards by referring friends',
-          onPress: () => router.push('/referrals' as any),
+          onPress: () => Alert.alert('Refer Friends', 'Referral screen would open here'),
         },
         {
           icon: <Star size={20} color="#3B82F6" />,
@@ -129,13 +138,13 @@ export default function ProfileScreen() {
           icon: <HelpCircle size={20} color="#3B82F6" />,
           title: 'Help & Support',
           subtitle: 'Get help with your account',
-          onPress: () => router.push('/help-support' as any),
+          onPress: () => Alert.alert('Help & Support', 'Support screen would open here'),
         },
         {
           icon: <FileText size={20} color="#3B82F6" />,
           title: 'Terms & Privacy',
           subtitle: 'Read our terms and privacy policy',
-          onPress: () => router.push('/terms-privacy' as any),
+          onPress: () => Alert.alert('Terms & Privacy', 'Terms and privacy screen would open here'),
         },
       ]
     }
@@ -144,8 +153,14 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
+        {/* Header with Back Button */}
         <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={24} color="#1E293B" />
+          </TouchableOpacity>
           <View style={styles.headerContent}>
             <View style={styles.imageContainer}>
               <Image 
@@ -165,17 +180,17 @@ export default function ProfileScreen() {
               </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.settingsButton}>
+          <TouchableOpacity style={styles.settingsButton} onPress={handleSettings}>
             <Settings size={24} color="#64748B" />
           </TouchableOpacity>
         </View>
         
         {/* Stats */}
         <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
+          <TouchableOpacity style={styles.statItem} onPress={handleMyBookings}>
             <Text style={styles.statValue}>12</Text>
             <Text style={styles.statLabel}>Bookings</Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>4.8</Text>
@@ -340,6 +355,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
   },
   headerContent: {
     flexDirection: 'row',

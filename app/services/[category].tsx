@@ -8,6 +8,8 @@ import {
   Image,
   TextInput,
   Platform,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -19,7 +21,9 @@ import {
   Filter,
   Heart,
   Phone,
-  MessageCircle 
+  MessageCircle,
+  X,
+  Sliders
 } from 'lucide-react-native';
 
 // Mock data for different service categories
@@ -170,16 +174,47 @@ export default function ServiceListingScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filters, setFilters] = useState({
+    minRating: 0,
+    maxPrice: 1000,
+    experience: 0,
+    verified: false,
+    availability: 'all'
+  });
+  const [tempFilters, setTempFilters] = useState(filters);
 
   const providers = SERVICE_PROVIDERS[category as keyof typeof SERVICE_PROVIDERS] || [];
   const categoryName = CATEGORY_NAMES[category as keyof typeof CATEGORY_NAMES] || 'Services';
 
-  const filteredProviders = providers.filter(provider =>
-    provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    provider.services.some(service => 
-      service.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
+  const filteredProviders = providers.filter(provider => {
+    // Search filter
+    const matchesSearch = provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      provider.services.some(service => 
+        service.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+    // Rating filter
+    const matchesRating = provider.rating >= filters.minRating;
+
+    // Price filter (extract numeric value from price string)
+    const priceValue = parseInt(provider.price.replace(/[^\d]/g, ''));
+    const matchesPrice = priceValue <= filters.maxPrice;
+
+    // Experience filter
+    const experienceValue = parseInt(provider.experience.replace(/[^\d]/g, ''));
+    const matchesExperience = experienceValue >= filters.experience;
+
+    // Verified filter
+    const matchesVerified = !filters.verified || provider.verified;
+
+    // Availability filter
+    const matchesAvailability = filters.availability === 'all' || 
+      provider.availability.toLowerCase().includes(filters.availability);
+
+    return matchesSearch && matchesRating && matchesPrice && 
+           matchesExperience && matchesVerified && matchesAvailability;
+  });
 
   const toggleFavorite = (providerId: string) => {
     setFavorites(prev => 
@@ -193,10 +228,31 @@ export default function ServiceListingScreen() {
     router.push(`/booking/${providerId}`);
   };
 
+  const handleProviderPress = (providerId: string) => {
+    router.push(`/provider/${providerId}`);
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    setShowFilterModal(false);
+  };
+
+  const resetFilters = () => {
+    const defaultFilters = {
+      minRating: 0,
+      maxPrice: 1000,
+      experience: 0,
+      verified: false,
+      availability: 'all'
+    };
+    setTempFilters(defaultFilters);
+    setFilters(defaultFilters);
+  };
+
   const renderProvider = ({ item }: { item: any }) => (
     <TouchableOpacity 
       style={styles.providerCard}
-      onPress={() => router.push("/provider/[id]" as any)}
+      onPress={() => handleProviderPress(item.id)}
       activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>
@@ -263,14 +319,6 @@ export default function ServiceListingScreen() {
         </View>
 
         <View style={styles.actionButtons}>
-          {/* <TouchableOpacity style={styles.callButton}>
-            <Phone size={16} color="#FFFFFF" />
-            <Text style={styles.callButtonText}>Call</Text>
-          </TouchableOpacity> */}
-          {/* <TouchableOpacity style={styles.messageButton}>
-            <MessageCircle size={16} color="#3B82F6" />
-            <Text style={styles.messageButtonText}>Message</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity 
             style={styles.bookButton}
             onPress={() => handleBookNow(item.id)}
@@ -292,7 +340,10 @@ export default function ServiceListingScreen() {
           <ArrowLeft size={24} color="#1E293B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{categoryName}</Text>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity 
+          style={styles.filterButton}
+          onPress={() => setShowFilterModal(true)}
+        >
           <Filter size={24} color="#1E293B" />
         </TouchableOpacity>
       </View>
@@ -327,6 +378,135 @@ export default function ServiceListingScreen() {
           </View>
         }
       />
+
+      {/* Filter Modal */}
+      <Modal
+        visible={showFilterModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowFilterModal(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowFilterModal(false)}>
+              <X size={24} color="#64748B" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Filters</Text>
+            <TouchableOpacity onPress={resetFilters}>
+              <Text style={styles.resetText}>Reset</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {/* Rating Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterTitle}>Minimum Rating</Text>
+              <View style={styles.ratingOptions}>
+                {[0, 3, 4, 4.5].map((rating) => (
+                  <TouchableOpacity
+                    key={rating}
+                    style={[
+                      styles.ratingOption,
+                      tempFilters.minRating === rating && styles.selectedOption
+                    ]}
+                    onPress={() => setTempFilters(prev => ({ ...prev, minRating: rating }))}
+                  >
+                    <Star size={16} color="#F59E0B" fill="#F59E0B" />
+                    <Text style={styles.ratingOptionText}>
+                      {rating === 0 ? 'Any' : `${rating}+`}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Price Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterTitle}>Maximum Price (₹/hr)</Text>
+              <View style={styles.priceOptions}>
+                {[500, 750, 1000, 1500].map((price) => (
+                  <TouchableOpacity
+                    key={price}
+                    style={[
+                      styles.priceOption,
+                      tempFilters.maxPrice === price && styles.selectedOption
+                    ]}
+                    onPress={() => setTempFilters(prev => ({ ...prev, maxPrice: price }))}
+                  >
+                    <Text style={styles.priceOptionText}>₹{price}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Experience Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterTitle}>Minimum Experience</Text>
+              <View style={styles.experienceOptions}>
+                {[0, 2, 5, 10].map((exp) => (
+                  <TouchableOpacity
+                    key={exp}
+                    style={[
+                      styles.experienceOption,
+                      tempFilters.experience === exp && styles.selectedOption
+                    ]}
+                    onPress={() => setTempFilters(prev => ({ ...prev, experience: exp }))}
+                  >
+                    <Text style={styles.experienceOptionText}>
+                      {exp === 0 ? 'Any' : `${exp}+ years`}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Verified Filter */}
+            <View style={styles.filterSection}>
+              <TouchableOpacity
+                style={styles.verifiedFilter}
+                onPress={() => setTempFilters(prev => ({ ...prev, verified: !prev.verified }))}
+              >
+                <View style={[
+                  styles.checkbox,
+                  tempFilters.verified && styles.checkedBox
+                ]}>
+                  {tempFilters.verified && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.verifiedText}>Verified providers only</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Availability Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterTitle}>Availability</Text>
+              <View style={styles.availabilityOptions}>
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'today', label: 'Available Today' },
+                  { key: 'tomorrow', label: 'Available Tomorrow' }
+                ].map((option) => (
+                  <TouchableOpacity
+                    key={option.key}
+                    style={[
+                      styles.availabilityOption,
+                      tempFilters.availability === option.key && styles.selectedOption
+                    ]}
+                    onPress={() => setTempFilters(prev => ({ ...prev, availability: option.key }))}
+                  >
+                    <Text style={styles.availabilityOptionText}>{option.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity style={styles.applyButton} onPress={applyFilters}>
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -561,34 +741,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  callButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#10B981',
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  callButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  messageButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#EFF6FF',
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  messageButtonText: {
-    color: '#3B82F6',
-    fontWeight: '600',
-    marginLeft: 4,
-  },
   bookButton: {
     flex: 1,
     alignItems: 'center',
@@ -615,5 +767,158 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: 14,
     color: '#94A3B8',
+  },
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1E293B',
+  },
+  resetText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#3B82F6',
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  filterSection: {
+    marginVertical: 20,
+  },
+  filterTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1E293B',
+    marginBottom: 12,
+  },
+  ratingOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  ratingOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  selectedOption: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#3B82F6',
+  },
+  ratingOptionText: {
+    fontSize: 14,
+    color: '#64748B',
+    marginLeft: 4,
+  },
+  priceOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  priceOption: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  priceOptionText: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  experienceOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  experienceOption: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  experienceOptionText: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  verifiedFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkedBox: {
+    backgroundColor: '#3B82F6',
+    borderColor: '#3B82F6',
+  },
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  availabilityOptions: {
+    gap: 8,
+  },
+  availabilityOption: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  availabilityOptionText: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  modalFooter: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  applyButton: {
+    backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  applyButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

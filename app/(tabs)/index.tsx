@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Search, ShoppingCart } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import ServiceCategoryGrid from '@/components/home/ServiceCategoryGrid';
 import FeaturedProviders from '@/components/home/FeaturedProviders';
 import RecentBookings from '@/components/home/RecentBookings';
@@ -27,6 +28,10 @@ export default function HomeScreen() {
     }).start();
   }, [fadeAnim]);
 
+  const handleCartPress = () => {
+    router.push('/cart');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
@@ -37,7 +42,10 @@ export default function HomeScreen() {
               <Text style={styles.locationNumber}>147,12th cross</Text>
               <Text style={styles.locationText}>Rachenahalli- Yelahanka- Bengalur...</Text>
             </View>
-            <TouchableOpacity style={styles.cartButton}>
+            <TouchableOpacity 
+              style={styles.cartButton}
+              onPress={handleCartPress}
+            >
               <ShoppingCart size={24} color="#1E293B" />
             </TouchableOpacity>
           </View>
@@ -79,7 +87,6 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   safeArea: {
