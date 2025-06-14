@@ -263,14 +263,14 @@ export default function ServiceListingScreen() {
         </View>
 
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.callButton}>
+          {/* <TouchableOpacity style={styles.callButton}>
             <Phone size={16} color="#FFFFFF" />
             <Text style={styles.callButtonText}>Call</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.messageButton}>
+          </TouchableOpacity> */}
+          {/* <TouchableOpacity style={styles.messageButton}>
             <MessageCircle size={16} color="#3B82F6" />
             <Text style={styles.messageButtonText}>Message</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity 
             style={styles.bookButton}
             onPress={() => handleBookNow(item.id)}

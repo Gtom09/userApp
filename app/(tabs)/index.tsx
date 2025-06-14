@@ -34,7 +34,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.locationContainer}>
-              <Text style={styles.locationNumber}>147</Text>
+              <Text style={styles.locationNumber}>147,12th cross</Text>
               <Text style={styles.locationText}>Rachenahalli- Yelahanka- Bengalur...</Text>
             </View>
             <TouchableOpacity style={styles.cartButton}>
@@ -48,7 +48,7 @@ export default function HomeScreen() {
           <Search size={20} color="#94A3B8" style={styles.searchIcon} />
           <TextInput 
             style={styles.searchInput} 
-            placeholder="Search for 'AC service'"
+            placeholder="Search for 'Interior Designers'"
             placeholderTextColor="#94A3B8"
           />
         </View>
@@ -79,6 +79,7 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   safeArea: {
