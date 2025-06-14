@@ -13,18 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import { 
-  ArrowLeft, 
-  Search, 
-  Star, 
-  MapPin, 
-  Filter,
-  Heart,
-  Phone,
-  MessageCircle,
-  X,
-  Sliders
-} from 'lucide-react-native';
+import { ArrowLeft, Search, Star, MapPin, Filter, Heart, Phone, MessageCircle, X, FileSliders as Sliders } from 'lucide-react-native';
 
 // Mock data for different service categories
 const SERVICE_PROVIDERS = {

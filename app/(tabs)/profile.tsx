@@ -13,24 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { 
-  ChevronRight, 
-  Settings, 
-  MapPin, 
-  CreditCard, 
-  Bell, 
-  HelpCircle, 
-  LogOut,
-  Edit3,
-  Camera,
-  Star,
-  Shield,
-  Gift,
-  Users,
-  FileText,
-  X,
-  ArrowLeft
-} from 'lucide-react-native';
+import { ChevronRight, Settings, MapPin, CreditCard, Bell, CircleHelp as HelpCircle, LogOut, CreditCard as Edit3, Camera, Star, Shield, Gift, Users, FileText, X, ArrowLeft } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
