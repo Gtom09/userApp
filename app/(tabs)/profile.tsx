@@ -10,6 +10,7 @@ import {
   Switch,
   Modal,
   TextInput,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -136,36 +137,33 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header with Back Button */}
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={24} color="#1E293B" />
-          </TouchableOpacity>
-          <View style={styles.headerContent}>
-            <View style={styles.imageContainer}>
-              <Image 
-                source={{ uri: userProfile.image }} 
-                style={styles.profileImage} 
-              />
-              <TouchableOpacity style={styles.cameraButton}>
-                <Camera size={16} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{userProfile.name}</Text>
-              <Text style={styles.profileEmail}>{userProfile.email}</Text>
-              <View style={styles.locationContainer}>
-                <MapPin size={14} color="#64748B" />
-                <Text style={styles.locationText}>{userProfile.location}</Text>
+        {/* Header */}
+        <View style={styles.headerWrapper}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.imageContainer}>
+                <Image 
+                  source={{ uri: userProfile.image }} 
+                  style={styles.profileImage} 
+                />
+                <TouchableOpacity style={styles.cameraButton}>
+                  <Camera size={16} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>{userProfile.name}</Text>
+                <View style={styles.profileDetails}>
+                  <View style={styles.detailItem}>
+                    <MapPin size={14} color="#64748B" />
+                    <Text style={styles.detailText}>{userProfile.location}</Text>
+                  </View>
+                  <View style={styles.detailItem}>
+                    <Text style={styles.detailText}>{userProfile.email}</Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.settingsButton} onPress={handleSettings}>
-            <Settings size={24} color="#64748B" />
-          </TouchableOpacity>
         </View>
         
         {/* Stats */}
@@ -262,12 +260,13 @@ export default function ProfileScreen() {
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Phone Number</Text>
               <TextInput
-                style={styles.formInput}
+                style={[styles.formInput, styles.disabledInput]}
                 value={userProfile.phone}
-                onChangeText={(text) => setUserProfile(prev => ({ ...prev, phone: text }))}
+                editable={false}
                 placeholder="Enter your phone number"
-                keyboardType="phone-pad"
+                placeholderTextColor="#94A3B8"
               />
+              <Text style={styles.disabledText}>Mobile number cannot be changed</Text>
             </View>
 
             <View style={styles.formGroup}>
@@ -331,70 +330,100 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+  headerWrapper: {
+    paddingTop: Platform.OS === 'ios' ? 0 : 16,
+    paddingHorizontal: 16,
+    marginBottom: 16,
   },
-  backButton: {
-    padding: 8,
-    marginRight: 12,
+  header: {
+    backgroundColor: '#F8FAFC',
+    paddingTop: 24,
+    paddingBottom: 24,
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.03,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    paddingHorizontal: 20,
   },
   imageContainer: {
     position: 'relative',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 30,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   cameraButton: {
     position: 'absolute',
     bottom: 0,
     right: 0,
     backgroundColor: '#3B82F6',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
+    borderRadius: 16,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   profileInfo: {
-    marginLeft: 16,
+    marginLeft: 20,
     flex: 1,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 4,
+    marginBottom: 12,
   },
-  profileEmail: {
-    fontSize: 14,
-    color: '#64748B',
-    marginBottom: 4,
+  profileDetails: {
+    gap: 8,
   },
-  locationContainer: {
+  detailItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  locationText: {
+  detailText: {
     fontSize: 14,
     color: '#64748B',
-    marginLeft: 4,
-  },
-  settingsButton: {
-    padding: 8,
+    marginLeft: 6,
+    fontWeight: '500',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -578,5 +607,14 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     borderWidth: 1,
     borderColor: '#E2E8F0',
+  },
+  disabledInput: {
+    backgroundColor: '#F1F5F9',
+    color: '#64748B',
+  },
+  disabledText: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 4,
   },
 });
