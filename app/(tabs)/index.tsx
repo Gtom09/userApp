@@ -29,7 +29,7 @@ export default function HomeScreen() {
   }, [fadeAnim]);
 
   const handleCartPress = () => {
-    router.push('/cart/index');
+    router.push('/cart');
   };
 
   return (

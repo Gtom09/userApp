@@ -19,7 +19,7 @@ const DUMMY_BOOKINGS = [
     providerName: 'Mike Johnson',
     date: 'Tomorrow, 10:00 AM',
     status: 'upcoming',
-    imageUrl: 'https://images.pexels.com/photos/8961315/pexels-photo-8961315.jpeg?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.pexels.com/photos/8961382/pexels-photo-8961382.jpeg?auto=compress&cs=tinysrgb&w=600',
   },
   {
     id: '3',
@@ -35,7 +35,7 @@ const DUMMY_BOOKINGS = [
     providerName: 'David Wilson',
     date: 'Oct 10, 11:00 AM',
     status: 'completed',
-    imageUrl: 'https://images.pexels.com/photos/8005376/pexels-photo-8005376.jpeg?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.pexels.com/photos/8943644/pexels-photo-8943644.jpeg?auto=compress&cs=tinysrgb&w=600',
   },
   {
     id: '5',

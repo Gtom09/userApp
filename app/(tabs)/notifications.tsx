@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, CircleCheck as CheckCircle, CircleAlert as AlertCircle, Calendar, Star } from 'lucide-react-native';
@@ -55,6 +55,18 @@ const DUMMY_NOTIFICATIONS = [
 ];
 
 export default function NotificationsScreen() {
+  const [notifications, setNotifications] = useState(DUMMY_NOTIFICATIONS);
+
+  const markAsRead = (id: string) => {
+    setNotifications(prevNotifications =>
+      prevNotifications.map(notification =>
+        notification.id === id
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'booking':
@@ -100,6 +112,7 @@ export default function NotificationsScreen() {
         !item.read && styles.unreadNotification
       ]}
       activeOpacity={0.7}
+      onPress={() => markAsRead(item.id)}
     >
       <View style={[
         styles.iconContainer,
@@ -128,7 +141,7 @@ export default function NotificationsScreen() {
     </TouchableOpacity>
   );
 
-  const unreadCount = DUMMY_NOTIFICATIONS.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -143,7 +156,7 @@ export default function NotificationsScreen() {
         </View>
         
         <FlatList
-          data={DUMMY_NOTIFICATIONS}
+          data={notifications}
           keyExtractor={(item) => item.id}
           renderItem={renderNotification}
           contentContainerStyle={styles.listContent}

@@ -249,7 +249,7 @@ export default function BookingScreen() {
       </ScrollView>
 
       {/* Book Button */}
-      <View style={styles.footer}>
+      <SafeAreaView edges={['bottom']} style={styles.footer}>
         <TouchableOpacity
           style={[
             styles.bookButton,
@@ -262,7 +262,7 @@ export default function BookingScreen() {
             {loading ? 'Confirming Booking...' : 'Confirm Booking'}
           </Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </SafeAreaView>
   );
 }
