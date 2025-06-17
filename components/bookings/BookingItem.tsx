@@ -6,12 +6,13 @@ import {
   TouchableOpacity, 
   Image, 
   Platform,
-  Modal,
+  Modal as RNModal,
   TextInput,
   Alert,
   ScrollView
 } from 'react-native';
 import { Calendar, MessageCircle, Star, X, XCircle } from 'lucide-react-native';
+import { Modal } from '@/components/common/Modal';
 
 interface BookingProps {
   booking: {
@@ -37,6 +38,17 @@ const CANCELLATION_REASONS = [
 export function BookingItem({ booking, onStatusChange }: BookingProps) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    buttons?: { text: string; onPress: () => void; style?: 'primary' | 'secondary' | 'destructive' }[];
+  }>({
+    title: '',
+    message: '',
+    type: 'info',
+  });
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,14 +89,19 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
     setShowCancelModal(true);
   };
 
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning', buttons?: { text: string; onPress: () => void; style?: 'primary' | 'secondary' | 'destructive' }[]) => {
+    setAlertConfig({ title, message, type, buttons });
+    setShowAlertModal(true);
+  };
+
   const handleCancelConfirm = async () => {
     if (!selectedReason) {
-      Alert.alert('Reason Required', 'Please select a reason for cancellation.');
+      showAlert('Reason Required', 'Please select a reason for cancellation.', 'warning');
       return;
     }
 
     if (selectedReason === 'Other' && !otherReason.trim()) {
-      Alert.alert('Reason Required', 'Please provide a reason for cancellation.');
+      showAlert('Reason Required', 'Please provide a reason for cancellation.', 'warning');
       return;
     }
 
@@ -102,13 +119,14 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
       setSelectedReason('');
       setOtherReason('');
       
-      Alert.alert(
+      showAlert(
         'Booking Cancelled',
         'Your booking has been cancelled successfully.',
-        [{ text: 'OK' }]
+        'success',
+        [{ text: 'OK', onPress: () => setShowAlertModal(false), style: 'primary' }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to cancel booking. Please try again.');
+      showAlert('Error', 'Failed to cancel booking. Please try again.', 'error');
     } finally {
       setIsCancelling(false);
     }
@@ -116,7 +134,7 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
 
   const submitRating = async () => {
     if (rating === 0) {
-      Alert.alert('Rating Required', 'Please select a rating before submitting.');
+      showAlert('Rating Required', 'Please select a rating before submitting.', 'warning');
       return;
     }
 
@@ -130,9 +148,14 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
       setRating(0);
       setComment('');
       
-      Alert.alert('Thank You!', 'Your rating has been submitted successfully.');
+      showAlert(
+        'Thank You!',
+        'Your rating has been submitted successfully.',
+        'success',
+        [{ text: 'OK', onPress: () => setShowAlertModal(false), style: 'primary' }]
+      );
     } catch (error) {
-      Alert.alert('Error', 'Failed to submit rating. Please try again.');
+      showAlert('Error', 'Failed to submit rating. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -206,7 +229,7 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
       </TouchableOpacity>
 
       {/* Rating Modal */}
-      <Modal
+      <RNModal
         visible={showRatingModal}
         animationType="slide"
         onRequestClose={() => setShowRatingModal(false)}
@@ -283,10 +306,10 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
             </TouchableOpacity>
           </ScrollView>
         </View>
-      </Modal>
+      </RNModal>
 
       {/* Cancel Reason Modal */}
-      <Modal
+      <RNModal
         visible={showCancelModal}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -395,7 +418,16 @@ export function BookingItem({ booking, onStatusChange }: BookingProps) {
             </View>
           </ScrollView>
         </View>
-      </Modal>
+      </RNModal>
+
+      <Modal
+        visible={showAlertModal}
+        onClose={() => setShowAlertModal(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        buttons={alertConfig.buttons}
+      />
     </>
   );
 }

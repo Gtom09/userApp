@@ -8,17 +8,29 @@ import {
   ScrollView, 
   Alert,
   Switch,
-  Modal,
+  Modal as RNModal,
   TextInput,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ChevronRight, Settings, MapPin, CreditCard, Bell, CircleHelp as HelpCircle, LogOut, CreditCard as Edit3, Camera, Star, Shield, Gift, Users, FileText, X, ArrowLeft } from 'lucide-react-native';
+import { Modal } from '@/components/common/Modal';
 
 export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    buttons?: { text: string; onPress: () => void; style?: 'primary' | 'secondary' | 'destructive' }[];
+  }>({
+    title: '',
+    message: '',
+    type: 'info',
+  });
   const [userProfile, setUserProfile] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -27,17 +39,19 @@ export default function ProfileScreen() {
     image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
   });
 
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning', buttons?: { text: string; onPress: () => void; style?: 'primary' | 'secondary' | 'destructive' }[]) => {
+    setAlertConfig({ title, message, type, buttons });
+    setShowAlertModal(true);
+  };
+
   const handleLogout = () => {
-    Alert.alert(
+    showAlert(
       'Logout',
       'Are you sure you want to logout?',
+      'warning',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Logout', 
-          style: 'destructive',
-          onPress: () => router.replace('/(auth)/login')
-        }
+        { text: 'Cancel', onPress: () => setShowAlertModal(false), style: 'secondary' },
+        { text: 'Logout', onPress: () => router.replace('/(auth)/login'), style: 'destructive' }
       ]
     );
   };
@@ -51,12 +65,14 @@ export default function ProfileScreen() {
   };
 
   const handleSettings = () => {
-    Alert.alert('Settings', 'Settings screen would open here');
+    showAlert('Settings', 'Settings screen would open here', 'info');
   };
 
   const saveProfile = () => {
     setEditModalVisible(false);
-    Alert.alert('Success', 'Profile updated successfully!');
+    showAlert('Success', 'Profile updated successfully!', 'success', [
+      { text: 'OK', onPress: () => setShowAlertModal(false), style: 'primary' }
+    ]);
   };
 
   const menuSections = [
@@ -73,13 +89,13 @@ export default function ProfileScreen() {
           icon: <CreditCard size={20} color="#3B82F6" />,
           title: 'Payment Methods',
           subtitle: 'Manage your payment options',
-          onPress: () => Alert.alert('Payment Methods', 'Payment methods screen would open here'),
+          onPress: () => showAlert('Payment Methods', 'Payment methods screen would open here', 'info'),
         },
         {
           icon: <MapPin size={20} color="#3B82F6" />,
           title: 'Addresses',
           subtitle: 'Manage your saved addresses',
-          onPress: () => Alert.alert('Addresses', 'Addresses screen would open here'),
+          onPress: () => showAlert('Addresses', 'Addresses screen would open here', 'info'),
         },
       ]
     },
@@ -99,7 +115,7 @@ export default function ProfileScreen() {
           icon: <Shield size={20} color="#3B82F6" />,
           title: 'Privacy & Security',
           subtitle: 'Manage your privacy settings',
-          onPress: () => Alert.alert('Privacy & Security', 'Privacy settings screen would open here'),
+          onPress: () => showAlert('Privacy & Security', 'Privacy settings screen would open here', 'info'),
         },
       ]
     },
@@ -110,25 +126,25 @@ export default function ProfileScreen() {
           icon: <Gift size={20} color="#3B82F6" />,
           title: 'Refer Friends',
           subtitle: 'Earn rewards by referring friends',
-          onPress: () => Alert.alert('Refer Friends', 'Referral screen would open here'),
+          onPress: () => showAlert('Refer Friends', 'Referral screen would open here', 'info'),
         },
         {
           icon: <Star size={20} color="#3B82F6" />,
           title: 'Rate App',
           subtitle: 'Help us improve the app',
-          onPress: () => Alert.alert('Thank you!', 'Redirecting to app store...'),
+          onPress: () => showAlert('Thank you!', 'Redirecting to app store...', 'info'),
         },
         {
           icon: <HelpCircle size={20} color="#3B82F6" />,
           title: 'Help & Support',
           subtitle: 'Get help with your account',
-          onPress: () => Alert.alert('Help & Support', 'Support screen would open here'),
+          onPress: () => showAlert('Help & Support', 'Support screen would open here', 'info'),
         },
         {
           icon: <FileText size={20} color="#3B82F6" />,
           title: 'Terms & Privacy',
           subtitle: 'Read our terms and privacy policy',
-          onPress: () => Alert.alert('Terms & Privacy', 'Terms and privacy screen would open here'),
+          onPress: () => showAlert('Terms & Privacy', 'Terms and privacy screen would open here', 'info'),
         },
       ]
     }
@@ -212,7 +228,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Edit Profile Modal */}
-      <Modal
+      <RNModal
         visible={editModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -280,7 +296,16 @@ export default function ProfileScreen() {
             </View>
           </ScrollView>
         </SafeAreaView>
-      </Modal>
+      </RNModal>
+
+      <Modal
+        visible={showAlertModal}
+        onClose={() => setShowAlertModal(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        buttons={alertConfig.buttons}
+      />
     </SafeAreaView>
   );
 }

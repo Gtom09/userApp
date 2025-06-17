@@ -18,8 +18,10 @@ import {
   User,
   Phone,
   CreditCard,
-  CheckCircle
+  CheckCircle,
+  CheckCircle2
 } from 'lucide-react-native';
+import { Modal } from '@/components/common/Modal';
 
 const TIME_SLOTS = [
   '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
@@ -43,6 +45,7 @@ export default function BookingScreen() {
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedService, setSelectedService] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Mock provider data
   const provider = {
@@ -66,15 +69,18 @@ export default function BookingScreen() {
     // Simulate booking API call
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(
-        'Booking Confirmed!', 
-        `Your booking with ${provider.name} has been confirmed for ${DATES[selectedDate].date} at ${selectedTime}`,
-        [
-          { text: 'View Bookings', onPress: () => router.push('/(tabs)/bookings') },
-          { text: 'Go Home', onPress: () => router.push('/(tabs)') }
-        ]
-      );
+      setShowConfirmation(true);
     }, 2000);
+  };
+
+  const handleViewBookings = () => {
+    setShowConfirmation(false);
+    router.push('/(tabs)/bookings');
+  };
+
+  const handleGoHome = () => {
+    setShowConfirmation(false);
+    router.push('/(tabs)');
   };
 
   return (
@@ -263,6 +269,26 @@ export default function BookingScreen() {
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
+
+      <Modal
+        visible={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        title="Booking Confirmed!"
+        type="success"
+        message={`Your booking with ${provider.name} has been confirmed for ${DATES[selectedDate].date} at ${selectedTime}`}
+        buttons={[
+          {
+            text: 'View Bookings',
+            onPress: handleViewBookings,
+            style: 'primary'
+          },
+          {
+            text: 'Go Home',
+            onPress: handleGoHome,
+            style: 'secondary'
+          }
+        ]}
+      />
     </SafeAreaView>
   );
 }
